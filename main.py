@@ -29,7 +29,8 @@ if (useEnv == True) or (os.environ.get('universeId') != None):
     placeFilePath = str(os.environ.get('placeFilePath',"./place.rbxl"))
     shouldReplaceServers = bool(os.environ.get('shouldReplaceServers',False))
 
-desiredTime = (timeToRun - 1) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
+desiredTimeToSave = (timeToRun - 2) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
+desiredTimeToShutdown = (timeToRun)
 
 publishBaseUrl = "https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType={versionType}"
 shutdownBaseUrl = "https://www.roblox.com/games/shutdown-all-instances?placeId={placeId}&replaceInstances={shouldReplaceInstances}"
@@ -91,6 +92,9 @@ def RunFunction():
         if versionType == "Published":
             if robloxCookie != "":
                 print("Successfully published place, restarting servers...")
+                while True:
+                    if time.time() >= desiredTimeToShutdown:
+                        break
                 shutdownStatus,shutdownMsg = ShutdownServers()
                 if shutdownStatus != True:
                     print("Failed to restart servers: " + shutdownMsg)
@@ -105,7 +109,7 @@ print("Script started!")
 while True:
     if hasRan == True:
         break
-    if time.time() >= desiredTime:
+    if time.time() >= desiredTimeToSave:
         RunFunction()
         hasRan = True
     time.sleep(0.5)
