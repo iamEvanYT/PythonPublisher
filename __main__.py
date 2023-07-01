@@ -49,26 +49,29 @@ if (useEnv == True) or (os.environ.get('universeId') != None):
         shouldReplaceServers = bool(os.environ.get('shouldReplaceServers'))
     if os.environ.get('successfulPublishEventName') != None:
         successfulPublishEventName = str(os.environ.get('successfulPublishEventName'))
-    
+
 if (useSys == True) and (len(sys.argv) > 1):
-    if (sys.argv[1] != None):
-        timeToRun = int(sys.argv[1])
-    if (sys.argv[2] != None):
-        universeId = int(sys.argv[2])
-    if (sys.argv[3] != None):
-        placeId = int(sys.argv[3])
-    if (sys.argv[4] != None):
-        placeFilePath = sys.argv[4]
-    if (sys.argv[5] != None):
-        versionType = sys.argv[5]
-    if (sys.argv[6] != None):
-        openCloudApiKey = sys.argv[6]
-    if (sys.argv[7] != None):
-        robloxCookie = sys.argv[7]
-    if (sys.argv[8] != None):
-        shouldReplaceServers = bool(sys.argv[8])
-    if (sys.argv[9] != None):
-        successfulPublishEventName = sys.argv[9]
+    try:
+        if (sys.argv[1] != None):
+            timeToRun = int(sys.argv[1])
+        if (sys.argv[2] != None):
+            universeId = int(sys.argv[2])
+        if (sys.argv[3] != None):
+            placeId = int(sys.argv[3])
+        if (sys.argv[4] != None):
+            placeFilePath = sys.argv[4]
+        if (sys.argv[5] != None):
+            versionType = sys.argv[5]
+        if (sys.argv[6] != None):
+            openCloudApiKey = sys.argv[6]
+        if (sys.argv[7] != None):
+            robloxCookie = sys.argv[7]
+        if (sys.argv[8] != None):
+            shouldReplaceServers = bool(sys.argv[8])
+        if (sys.argv[9] != None):
+            successfulPublishEventName = sys.argv[9]
+    except:
+        pass
 
 desiredTimeToSave = (timeToRun - 2) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
 desiredTimeToShutdown = (timeToRun)
@@ -163,8 +166,6 @@ def RunFunction():
                     print("Failed to restart servers: " + shutdownMsg)
                 else:
                     print("Successfully restarted servers!")
-            else:
-                print("Successfully published place!")
         else:
             print("Successfully saved place!")
 
