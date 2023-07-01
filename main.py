@@ -1,4 +1,6 @@
 # Info #
+# PythonPublisher
+# This script will publish a place file to a Roblox experience at a specific set time.
 # Made by iamEvanYT (Github)
 
 # CONFIG #
@@ -17,6 +19,7 @@ import requests
 import time
 import os
 hasRan = False
+Version = "1.0.0"
 
 if (useEnv == True) or (os.environ.get('universeId') != None):
     # Use default values if not defined in .env file
@@ -104,7 +107,9 @@ def RunFunction():
         else:
             print("Successfully saved place!")
 
-print("Script started!")
+print("PythonPublisher started!")
+print("Version: {version}".format(version=Version))
+print("Created by iamEvanYT (Github)")
 while True:
     if hasRan == True:
         break
@@ -112,3 +117,7 @@ while True:
         RunFunction()
         hasRan = True
     time.sleep(0.5)
+    
+print("PythonPublisher finished running!")
+while True:
+    time.sleep(60*60)
