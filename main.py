@@ -19,7 +19,7 @@ import requests
 import time
 import os
 hasRan = False
-Version = "1.0.0"
+Version = "v1.0.1"
 
 if (useEnv == True) or (os.environ.get('universeId') != None):
     # Use default values if not defined in .env file
