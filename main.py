@@ -20,9 +20,9 @@ hasRan = False
 
 if (useEnv == True) or (os.environ.get('universeId') != None):
     # Use default values if not defined in .env file
-    timeToRun = int(os.environ.get('timeToRun',0))
-    universeId = int(os.environ.get('universeId',0))
-    placeId = int(os.environ.get('placeId',0))
+    timeToRun = float(os.environ.get('timeToRun',0))
+    universeId = float(os.environ.get('universeId',0))
+    placeId = float(os.environ.get('placeId',0))
     versionType = str(os.environ.get('versionType',"Published"))
     openCloudApiKey = str(os.environ.get('openCloudApiKey',""))
     robloxCookie = str(os.environ.get('robloxCookie',""))
