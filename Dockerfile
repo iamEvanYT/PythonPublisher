@@ -10,5 +10,6 @@ FROM py
 ENV USING_DOCKER yes
 COPY --from=build /inst /usr/local
 
-WORKDIR /.
+WORKDIR /app
+COPY . /app
 CMD python .
