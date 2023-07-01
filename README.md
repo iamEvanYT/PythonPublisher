@@ -7,6 +7,8 @@ PythonPublisher is a Python script for automating the process of publishing Robl
 
 The following parameters are used for configuring the script:
 
+- `useSys`: If disabled, it will ignore values given from command line.
+
 - `useEnv`: If enabled, use values from `.env` file instead of the values below. This offers better security. If `universeId` is defined in `.env`, the value in the script will be ignored and `.env` will be used.
 
 - `timeToRun`: This is the time that this script will update your place. Get a timestamp [here](https://www.epochconverter.com/).
@@ -29,7 +31,9 @@ The following parameters are used for configuring the script:
 
 The script runs in an infinite loop (with `time.sleep` to pause execution) until the specified time to run is reached (`timeToRun`), at which point it calls the internal function `RunFunction()`. `RunFunction()` handles the process of publishing the place and optionally restarting servers.
 
-To run the script, simply run `python main.py` in your terminal after cloning the Github Project.
+To run the script, simply run `python .` in your terminal after cloning the Github Project.
+
+Usage: `python . [timeToRun] [universeId] [placeId] [placeFilePath] [versionType] [openCloudApiKey] [robloxCookie] [shouldReplaceServers] [successfulPublishEventName]`
 
 ## Contributions
 
