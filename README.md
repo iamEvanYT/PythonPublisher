@@ -1,49 +1,46 @@
 # [PythonPublisher](https://github.com/iamEvanYT/PythonPublisher)
 ## Made by [iamEvanYT](https://github.com/iamEvanYT)
 
-The `PythonPublisher` script is designed to publish a place file to a specific Roblox experience at a certain time. This is highly useful for Roblox developers who want to automate updates to their game, and is created by Github user `iamEvanYT`.
+PythonPublisher is a Python script for automating the process of publishing Roblox places. It allows you to schedule the publish at a specific time, replace servers, and optionally restart servers if you provide a Roblox cookie. The script also provides flexibility by allowing configuration through environment variables or direct input.
 
 ## Configuration
 
-Firstly, there are a set of configurable variables that you need to set:
+The following parameters are used for configuring the script:
 
-```py
-# CONFIG #
-useEnv = False #If enabled, use values from .env file instead of the values below. (Better security, if universeId is defined in .env, the value below will be ignored)
-timeToRun = 0 #This is a timestamp (https://www.epochconverter.com/)
-universeId = 0 #The identifier of the experience in which you want to publish your place to. You can copy your experience's Universe ID on Creator Dashboard.
-placeId = 0 #The identifier of the place you want to publish. You can copy your place's Place ID on Creator Dashboard.
-versionType = "Published" #The version type of the place you want to publish. You can choose between "Published" and "Saved".
-openCloudApiKey = "" #Your Roblox Open Cloud API key, used for saving/publishing the place file. (Register one here: https://create.roblox.com/dashboard/credentials)
-robloxCookie = "" #Your Roblox Cookie, used for restarting servers. (Leave blank to disable, servers with only be restarted if the new version is Published)
-placeFilePath = "./place.rbxl" #The Path of the Roblox place file (RBXL Format) you want to publish.
-shouldReplaceServers = False #Whether or not you want to replace servers instead of restarting them. (Buggy & Experimental) (Not recommended)
-```
+- `useEnv`: If enabled, use values from `.env` file instead of the values below. This offers better security. If `universeId` is defined in `.env`, the value in the script will be ignored and `.env` will be used.
+
+- `timeToRun`: This is the time that this script will update your place. Get a timestamp [here](https://www.epochconverter.com/).
+
+- `universeId`: The identifier of the experience in which you want to publish your place to. You can copy your experience's Universe ID on Creator Dashboard.
+
+- `placeId`: The identifier of the place you want to publish. You can copy your place's Place ID on Creator Dashboard.
+
+- `versionType`: The version type of the place you want to publish. You can choose between "Published" and "Saved".
+
+- `openCloudApiKey`: Your Roblox Open Cloud API key, used for saving/publishing the place file. Generate one [here](https://create.roblox.com/dashboard/credentials).
+
+- `robloxCookie`: Your Roblox Cookie, used for restarting servers. Leave blank to disable; servers will only be restarted if the new version is Published.
+
+- `placeFilePath`: The path of the Roblox place file (RBXL Format) you want to publish.
+
+- `shouldReplaceServers`: Whether or not you want to replace servers instead of restarting them. This feature is experimental and may be buggy, so it is not recommended.
 
 ## Running the Script
 
-The script begins by setting up some preliminary data, such as URLs for publishing and shutting down servers, and a check for the use of a `.env` file for storing configuration. 
+The script runs in an infinite loop (with `time.sleep` to pause execution) until the specified time to run is reached (`timeToRun`), at which point it calls the internal function `RunFunction()`. `RunFunction()` handles the process of publishing the place and optionally restarting servers.
 
-After that, it defines several **internal** functions:
+To run the script, simply run `python main.py` in your terminal after cloning the Github Project.
 
-### `SetPlaceFile()`
+## Contributions
 
-This function is used to upload the place file to the Roblox server. It uses a `POST` request to the Roblox API with the place file as the payload. It will return the status of the operation and a corresponding message.
+This script is developed by [iamEvanYT](https://github.com/iamEvanYT). Contributions are welcomed via GitHub issues and pull requests.
 
-### `GetAuthenticatedSession()`
+## License
 
-This function is used to create an authenticated session with Roblox. It sets the necessary headers and cookies for the session, and makes a request to get a CSRF token, which is then added to the session headers.
+This project is licensed under the MIT License.
 
-### `ShutdownServers()`
+## Disclaimer
 
-This function uses the authenticated session from `GetAuthenticatedSession()` to send a `POST` request to Roblox, telling it to shut down all instances of the specified place. The status of the operation and a corresponding message are returned.
+Use this script responsibly. The developers of this script are not responsible for any misuse or violation of Roblox's Terms of Service. Always respect Roblox's rules when using this script.
 
-### `RunFunction()`
-
-This function calls `SetPlaceFile()` and then depending on the configuration, may also call `ShutdownServers()`.
-
-The script then enters a loop, waiting until the desired publish time is reached. Once it is, it calls `RunFunction()`, prints a success message, and enters an idle state.
-
-## Conclusion
-
-`PythonPublisher` is a powerful tool for automating game updates on Roblox. By configuring the script properly, developers can save a lot of time and effort and update when they are offline.
+This script is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the script or the use or other dealings in the script.
