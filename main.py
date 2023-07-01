@@ -92,9 +92,8 @@ def RunFunction():
         if versionType == "Published":
             if robloxCookie != "":
                 print("Successfully published place, restarting servers...")
-                while True:
-                    if time.time() >= desiredTimeToShutdown:
-                        break
+                while (time.time() < desiredTimeToShutdown):
+                    time.sleep(0.2)
                 shutdownStatus,shutdownMsg = ShutdownServers()
                 if shutdownStatus != True:
                     print("Failed to restart servers: " + shutdownMsg)
