@@ -25,7 +25,7 @@ import os
 import sys
 import json
 hasRan = False
-version = "v1.1.0"
+version = "v1.1.1"
 
 if (useEnv == True) or (os.environ.get('universeId') != None):
     # Use default values if not defined in .env file
@@ -72,6 +72,18 @@ if (useSys == True) and (len(sys.argv) > 1):
             successfulPublishEventName = sys.argv[9]
     except:
         pass
+    
+if (placeFilePath == "") or (placeFilePath == None):
+    raise Exception("Please specify a place file path.")
+
+if (openCloudApiKey == "") or (openCloudApiKey == None):
+    raise Exception("Please specify an Open Cloud API key.")
+
+if (universeId == 0) or (universeId == None):
+    raise Exception("Please specify a universe ID.")
+
+if (placeId == 0) or (placeId == None):
+    raise Exception("Please specify a place ID.")
 
 desiredTimeToSave = (timeToRun - 2) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
 desiredTimeToShutdown = (timeToRun)
