@@ -20,14 +20,14 @@ hasRan = False
 
 if (useEnv == True) or (os.environ.get('universeId') != None):
     # Use default values if not defined in .env file
-    timeToRun = os.environ.get('timeToRun',0)
-    universeId = os.environ.get('universeId',0)
-    placeId = os.environ.get('placeId',0)
-    versionType = os.environ.get('versionType',"Published")
-    openCloudApiKey = os.environ.get('openCloudApiKey',"")
-    robloxCookie = os.environ.get('robloxCookie',"")
-    placeFilePath = os.environ.get('placeFilePath',"./place.rbxl")
-    shouldReplaceServers = os.environ.get('shouldReplaceServers',False)
+    timeToRun = int(os.environ.get('timeToRun',0))
+    universeId = int(os.environ.get('universeId',0))
+    placeId = int(os.environ.get('placeId',0))
+    versionType = str(os.environ.get('versionType',"Published"))
+    openCloudApiKey = str(os.environ.get('openCloudApiKey',""))
+    robloxCookie = str(os.environ.get('robloxCookie',""))
+    placeFilePath = str(os.environ.get('placeFilePath',"./place.rbxl"))
+    shouldReplaceServers = bool(os.environ.get('shouldReplaceServers',False))
 
 desiredTime = (timeToRun - 1) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
 
