@@ -2,19 +2,32 @@
 # Made by iamEvanYT (Github)
 
 # CONFIG #
+useEnv = False #If enabled, use values from .env file instead of the values below. (Better security, if universeId is defined in .env, the value below will be ignored)
 timeToRun = 0 #This is a timestamp (https://www.epochconverter.com/)
 universeId = 0 #The identifier of the experience in which you want to publish your place to. You can copy your experience's Universe ID on Creator Dashboard.
 placeId = 0 #The identifier of the place you want to publish. You can copy your place's Place ID on Creator Dashboard.
 versionType = "Published" #The version type of the place you want to publish. You can choose between "Published" and "Saved".
 openCloudApiKey = "" #Your Roblox Open Cloud API key, used for saving/publishing the place file. (Register one here: https://create.roblox.com/dashboard/credentials)
 robloxCookie = "" #Your Roblox Cookie, used for restarting servers. (Leave blank to disable, servers with only be restarted if the new version is Published)
-placeFilePath = "./place.rbxl" #The Path of the Roblox place file you want to publish.
+placeFilePath = "./place.rbxl" #The Path of the Roblox place file (RBXL Format) you want to publish.
 shouldReplaceServers = False #Whether or not you want to replace servers instead of restarting them. (Buggy & Experimental) (Not recommended)
 
 # SCRIPT #
 import requests
 import time
+import os
 hasRan = False
+
+if (useEnv == True) or (os.environ.get('universeId') != None):
+    # Use default values if not defined in .env file
+    timeToRun = os.environ.get('timeToRun',0)
+    universeId = os.environ.get('universeId',0)
+    placeId = os.environ.get('placeId',0)
+    versionType = os.environ.get('versionType',"Published")
+    openCloudApiKey = os.environ.get('openCloudApiKey',"")
+    robloxCookie = os.environ.get('robloxCookie',"")
+    placeFilePath = os.environ.get('placeFilePath',"./place.rbxl")
+    shouldReplaceServers = os.environ.get('shouldReplaceServers',False)
 
 desiredTime = (timeToRun - 1) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
 
