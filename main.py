@@ -92,7 +92,7 @@ print("Script started!")
 while True:
     if hasRan == True:
         break
-    if time.time() >= timeToRun:
+    if time.time() >= desiredTime:
         RunFunction()
         hasRan = True
     time.sleep(0.5)
