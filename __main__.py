@@ -130,7 +130,7 @@ def GetAuthenticatedSession():
 def ShutdownServers():
     session = GetAuthenticatedSession()
 
-    url = shutdownBaseUrl.format(placeId=placeId, shouldReplaceInstances=True)
+    url = shutdownBaseUrl.format(placeId=placeId, shouldReplaceInstances=shouldReplaceServers)
     response = session.post(url, data={
         "placeId": placeId,
         "replaceInstances": shouldReplaceServers
