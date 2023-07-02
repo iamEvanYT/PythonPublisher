@@ -12,4 +12,4 @@ COPY --from=build /inst /usr/local
 
 WORKDIR /app
 COPY . /app
-CMD python main.py
+CMD python .
