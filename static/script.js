@@ -267,4 +267,5 @@ function FetchAllScheduledTasks() {
     });
 }
 
+FetchAllScheduledTasks()
 setInterval(FetchAllScheduledTasks, 1000);
