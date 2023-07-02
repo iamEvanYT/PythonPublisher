@@ -78,6 +78,8 @@ def index():
 @app.route('/<path:filename>')
 @auth.login_required
 def serve_static(filename):
+    if filename.endswith("/"):
+        filename = filename[:-1]
     if os.path.isdir('static/' + filename):
         index_file = os.path.join(filename, 'index.html')
         if os.path.exists('static/' + index_file):
@@ -89,20 +91,6 @@ def getScheduledUpdates():
 
 def setScheduledUpdates(newJson):
     return write_json("./databases/scheduledUpdates.json", newJson)
-
-# Dummy data for scheduled updates
-scheduled_updates = [
-    {
-        "id": 1,
-        "name": "Update 1",
-        "time": "2023-07-05 14:00:00"
-    },
-    {
-        "id": 2,
-        "name": "Update 2",
-        "time": "2023-07-07 10:30:00"
-    }
-]
 
 def getSettings():
     configData = read_json("./databases/settings.json", {})
@@ -237,14 +225,12 @@ print("Created by iamEvanYT (Github)")
     
 def UpdateGame(UID,placeFilePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun):
     success = update.RunUpdate(placeFilePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun)
-    print("success",success)
     get = getScheduledUpdates()
     if success == True:
         get[UID]["status"] = "Completed"
     else:
         get[UID]["status"] = "Failed"
     setScheduledUpdates(get)
-    print("getScheduledUpdates()",getScheduledUpdates())
     
 pathTemplate = "./uploads/{fileId}.rbxl"
 def CheckScheduledTasks():

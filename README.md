@@ -3,37 +3,43 @@
 
 PythonPublisher is a Python script for automating the process of publishing Roblox places. It allows you to schedule the publish at a specific time, replace servers, and optionally restart servers if you provide a Roblox cookie. The script also provides flexibility by allowing configuration through environment variables or direct input.
 
+Version 2 introduced a web panel to help schedule updates!
+
+## Downloading the script
+1. Download the whole repository as a `.zip` file
+2. Uncompress it
+3. Download python if you haven't
+
+## Dependencies
+
+Install all the dependencies using `pip install -r requirements.txt`
+
 ## Configuration
 
-The following parameters are used for configuring the script:
+The following parameters are able to configure in the script:
 
-- `useSys`: If disabled, it will ignore values given from command line.
+- `adminPassword`: Password for logging into web admin panel.
 
-- `useEnv`: If enabled, use values from `.env` file instead of the values below. This offers better security. If `universeId` is defined in `.env`, the value in the script will be ignored and `.env` will be used.
+The following parameters are able to configure in `.env` file:
 
-- `timeToRun`: This is the time that this script will update your place. Get a timestamp [here](https://www.epochconverter.com/).
+- `adminPassword`: If specified, it will override the value configured inside the script.
 
-- `universeId`: The identifier of the experience in which you want to publish your place to. You can copy your experience's Universe ID on Creator Dashboard.
+- `openCloudApiKey`: Your Roblox Open Cloud API key, used for saving/publishing the place file & firing events through MessagingService. Generate one [here](https://create.roblox.com/dashboard/credentials).
 
-- `placeId`: The identifier of the place you want to publish. You can copy your place's Place ID on Creator Dashboard.
+- `robloxCookie`: Your Roblox Cookie, used for restarting servers. Leave blank to specify inside web panel.
 
-- `versionType`: The version type of the place you want to publish. You can choose between "Published" and "Saved".
-
-- `openCloudApiKey`: Your Roblox Open Cloud API key, used for saving/publishing the place file. Generate one [here](https://create.roblox.com/dashboard/credentials).
-
-- `robloxCookie`: Your Roblox Cookie, used for restarting servers. Leave blank to disable; servers will only be restarted if the new version is Published.
-
-- `placeFilePath`: The path of the Roblox place file (RBXL Format) you want to publish.
-
-- `shouldReplaceServers`: Whether or not you want to replace servers instead of restarting them. This feature is experimental and may be buggy, so it is not recommended.
+- `PORT`: Specify a port. The default port is 3000.
 
 ## Running the Script
 
-The script runs in an infinite loop (with `time.sleep` to pause execution) until the specified time to run is reached (`timeToRun`), at which point it calls the internal function `RunFunction()`. `RunFunction()` handles the process of publishing the place and optionally restarting servers.
+Command line Usage: `python .`<br>
+Windows: Go inside the unzipped folder, and open `__main__.py`
 
-To run the script, simply run `python .` in your terminal after cloning the Github Project.
+Go to http://localhost:3000 or `localhost:<PORT>` if you have changed it in .env
+<br>Login using Username `admin` and your set password.<br>
+Default Password is `password`.
 
-Usage: `python . [timeToRun] [universeId] [placeId] [placeFilePath] [versionType] [openCloudApiKey] [robloxCookie] [shouldReplaceServers] [successfulPublishEventName]`
+The panel will be online until either `Ctrl+C` is used in Command Prompt or the file is closed in Windows.
 
 ## Contributions
 
