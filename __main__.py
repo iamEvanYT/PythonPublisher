@@ -294,7 +294,7 @@ def RunFlask():
     app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=False)
 
 flaskRun = Thread(target=RunFlask)
-flaskRun.setDaemon(True)
+flaskRun.daemon = True
 flaskRun.start()
 
 def CheckScheduledTasksAsync():
