@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>PythonPublisher - Scheduled Updates</title>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <a class="logo" href="index.html">PythonPublisher</a>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="new/index.html">New Update</a></li>
+          <li><a href="settings/index.html">Settings</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>Scheduled Updates</h1>
+    <!-- Display list of scheduled updates with options to edit and delete -->
+    <ul class="scheduled-updates">
+      <!-- Placeholder list item -->
+      <!-- <li>
+        <div class="update-info">
+          <span class="update-name">Update Name</span>
+          <span class="update-time">Scheduled Time</span>
+          <span class="update-universe">Universe ID: 123</span>
+          <span class="update-place">Place ID: 456</span>
+          <span class="update-restart">Restart Servers: Yes</span>
+        </div>
+        <div class="update-actions">
+          <button class="inspect-button">Inspect</button>
+          <button class="edit-button">Edit</button>
+          <button class="delete-button">Delete</button>
+        </div>
+      </li> -->
+    </ul>
+  </main>
+
+  <div id="inspect-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Inspect Update</h2>
+      <p><strong>Name:</strong> <span id="inspect-update-name"></span></p>
+      <p><strong>Scheduled Time:</strong> <span id="inspect-update-time"></span></p>
+      <p><strong>Universe ID:</strong> <span id="inspect-update-universe"></span></p>
+      <p><strong>Place ID:</strong> <span id="inspect-update-place"></span></p>
+      <p><strong>Restart Servers:</strong> <span id="inspect-update-restart"></span></p>
+      <div class="inspect-actions">
+        <button class="edit-button">Edit</button>
+        <button class="delete-button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Edit Update</h2>
+      <form id="edit-form">
+        <label for="edit-update-name">Name:</label>
+        <input type="text" id="edit-update-name" required>
+
+        <label for="edit-update-time">Scheduled Time:</label>
+        <input type="datetime-local" id="edit-update-time" required>
+
+        <label for="edit-update-universe">Universe ID:</label>
+        <input type="text" id="edit-update-universe" required>
+
+        <label for="edit-update-place">Place ID:</label>
+        <input type="text" id="edit-update-place" required>
+
+        <label for="edit-update-restart">Restart Servers:</label>
+        <select id="edit-update-restart">
+          <option value="none">None</option>
+          <option value="shutdown">Shutdown</option>
+          <option value="migrate">Migrate</option>
+        </select>
+
+        <label for="edit-update-type">Update Type:</label>
+        <select id="edit-update-type">
+          <option value="publish">Publish</option>
+          <option value="save">Save</option>
+        </select>
+
+        <button type="submit">OK</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
