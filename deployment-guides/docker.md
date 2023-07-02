@@ -63,7 +63,3 @@ docker rm pythonpublisher
 ```
 
 Please note that this will not delete the data in your mounted directories.
-
----
-
-You can replace `<admin_password>`, `<open_cloud_api_key>`, `<roblox_cookie>`, and `<port_number>` with the actual values for your application if you wish, or you can leave them as placeholders for users to fill in. Please adjust the instructions as necessary to match your project's setup and needs.
