@@ -41,6 +41,9 @@ Default Password is `password`.
 
 The panel will be online until either `Ctrl+C` is used in Command Prompt or the file is closed in Windows.
 
+## Docker Deployment
+For instructions on how to deploy this script using Docker, please refer to [this guide](/deployment-guides/docker.md)
+
 ## Contributions
 
 This script is developed by [iamEvanYT](https://github.com/iamEvanYT). Contributions are welcomed via GitHub issues and pull requests.
