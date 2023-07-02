@@ -54,6 +54,7 @@ def write_json(file_path, data):
         return False
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 120 * 1000 * 1000 # 120MB max file size
 app.static_url_path = ''
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'rbxl'}
@@ -134,6 +135,12 @@ def set_new_update():
     # Generate a unique ID for the new update
     UID = uuid.uuid4().hex
     gameFile = request.files.get("file")
+    fileSize = gameFile.seek(0, os.SEEK_END)
+    gameFile.seek(0, os.SEEK_SET)
+    print("fileSize",fileSize)
+    if fileSize > (100 * 1000 * 1000): # 100MB max file size
+       return jsonify({"message": "This RBXL file is too big!"}) 
+    
     formData = request.form.to_dict()
     newScheduledUpdate = {
         "id": UID,

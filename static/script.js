@@ -7,6 +7,7 @@ function openInspectModal(update) {
   const updateUniverse = modal.querySelector('#inspect-update-universe');
   const updatePlace = modal.querySelector('#inspect-update-place');
   const updateRestart = modal.querySelector('#inspect-update-restart');
+  const updateType = modal.querySelector('#inspect-update-type');
   const editButton = modal.querySelector('.edit-button');
   const deleteButton = modal.querySelector('.delete-button');
 
@@ -24,6 +25,12 @@ function openInspectModal(update) {
     } else {
       updateRestart.textContent = "None";
     }
+  }
+
+  if (update.updateType == "publish") {
+    updateType.textContent = "Publish";
+  } else {
+    updateType.textContent = "Save";
   }
 
   // Set event listeners for edit and delete buttons
@@ -113,7 +120,7 @@ function openEditModal(update) {
     const updatedTime = updateTimeInput.value;
     const updatedUniverse = updateUniverseInput.value;
     const updatedPlace = updatePlaceInput.value;
-    const updatedRestart = updateRestartInput.checked;
+    const updatedRestart = updateRestartInput.value;
     const updatedType = updateTypeInput.value;
 
     const updateDateTime = new Date(updatedTime);
@@ -153,6 +160,7 @@ function openEditModal(update) {
 
     // Close the modal
     modal.style.display = 'none';
+    document.getElementById('inspect-modal').style.display = 'none';
   });
 
   // Open the modal
