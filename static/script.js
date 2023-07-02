@@ -47,10 +47,6 @@ function openInspectModal(update) {
           // Update was successful, show responseJson.message
           response.json().then(responseJson => {
             alert(responseJson.message);
-            if (responseJson.message == "Scheduled update deleted successfully") {
-              // Reload page
-              location.reload();
-            }
           });
         } else {
           // Update failed
@@ -145,10 +141,6 @@ function openEditModal(update) {
         if (response.ok) {
           response.json().then(responseJson => {
             alert(responseJson.message);
-            if (responseJson.message == "Editted scheduled update successfully") {
-              // Reload page
-              location.reload();
-            }
           });
           console.log('Update sent successfully');
         } else {
@@ -236,10 +228,6 @@ function FetchAllScheduledTasks() {
                 // Update was successful, show responseJson.message
                 response.json().then(responseJson => {
                   alert(responseJson.message);
-                  if (responseJson.message == "Scheduled update deleted successfully") {
-                    // Reload page
-                    location.reload();
-                  }
                 });
               } else {
                 // Update failed
@@ -271,4 +259,4 @@ function FetchAllScheduledTasks() {
     });
 }
 
-setInterval(FetchAllScheduledTasks, 2000);
+setInterval(FetchAllScheduledTasks, 1000);
