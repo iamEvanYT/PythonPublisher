@@ -46,7 +46,7 @@ Now, your application is running in a Docker container!
 
 ### Accessing the application
 
-If you're running Docker locally, you can access your application at http://localhost:<PORT>. If you're running Docker on a remote server, replace "localhost" with the server's IP address.
+If you're running Docker locally, you can access your application at `http://localhost:<PORT>`. If you're running Docker on a remote server, replace "localhost" with the server's IP address.
 
 ### Stopping and Removing the Container
 
