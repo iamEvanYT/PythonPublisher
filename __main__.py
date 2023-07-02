@@ -15,7 +15,7 @@ version = "v2.0.0"
 from dotenv import load_dotenv
 load_dotenv() # Load .env file
 
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify, request, render_template
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -284,6 +284,18 @@ def CheckScheduledTasks():
             timeToRun = update["updateTime"]
             updateThread = Thread(target=UpdateGame, args=(id,filePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun))
             updateThread.start()
+           
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
            
 def RunFlask():
     app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=False)
