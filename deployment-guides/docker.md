@@ -46,7 +46,7 @@ Now, your application is running in a Docker container!
 
 ### Accessing the application
 
-If you're running Docker locally, you can access your application at http://localhost:<PORT>. If you're running Docker on a remote server, replace "localhost" with the server's IP address.
+If you're running Docker locally, you can access your application at `http://localhost:<PORT>`. If you're running Docker on a remote server, replace "localhost" with the server's IP address.
 
 ### Stopping and Removing the Container
 
@@ -63,7 +63,3 @@ docker rm pythonpublisher
 ```
 
 Please note that this will not delete the data in your mounted directories.
-
----
-
-You can replace `<admin_password>`, `<open_cloud_api_key>`, `<roblox_cookie>`, and `<port_number>` with the actual values for your application if you wish, or you can leave them as placeholders for users to fill in. Please adjust the instructions as necessary to match your project's setup and needs.
