@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style.css">
+  <title>PythonPublisher - New Update</title>
+</head>
+
+<body>
+  <header>
+    <div class="header-container">
+      <a class="logo" href="../index.html">PythonPublisher | Made by iamEvanYT</a>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="index.html">New Update</a></li>
+          <li><a href="../settings/index.html">Settings</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>New Update</h1>
+    <!-- Form for scheduling a new update -->
+    <form>
+      <label for="game-file">Game File (RBXL)</label>
+      <input type="file" id="game-file" accept=".rbxl">
+
+      <label for="update-time">Update Time</label>
+      <input type="datetime-local" id="update-time">
+
+      <label for="universe-id">Universe ID</label>
+      <input type="text" id="universe-id">
+
+      <label for="place-id">Place ID</label>
+      <input type="text" id="place-id">
+
+      <label for="restart-servers">Restart Servers</label>
+      <select id="restart-servers">
+        <option value="none">None</option>
+        <option value="shutdown">Shutdown</option>
+        <option value="migrate">Migrate</option>
+      </select>
+
+      <label for="update-name">Update Name</label>
+      <input type="text" id="update-name">
+
+      <label for="update-type">Update Type</label>
+      <select id="update-type">
+        <option value="publish">Publish</option>
+        <option value="save">Save</option>
+      </select>
+
+      <label for="messaging-service-topic">MessagingService Topic</label>
+      <input type="text" id="messaging-service-topic">
+
+      <label for="override-roblox-cookie">Override Roblox Cookie</label>
+      <input type="text" id="override-roblox-cookie">
+
+      <label for="override-opencloud-api-key">Override Open Cloud API Key</label>
+      <input type="text" id="override-opencloud-api-key">
+
+      <button type="submit">Schedule Update</button>
+    </form>
+  </main>
+
+  <a class="github-icon" href="https://github.com/iamEvanYT/PythonPublisher/" target="_blank">
+    <img src="../../assets/github-icon.png" alt="GitHub" width="50" height="50">
+  </a>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

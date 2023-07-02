@@ -1,1 +1,4 @@
 requests
+python-dotenv
+flask
+flask_httpauth

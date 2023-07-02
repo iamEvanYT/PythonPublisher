@@ -1,197 +1,308 @@
 # Info #
 # PythonPublisher
-# This script will publish a place file to a Roblox experience at a specific set time.
+# This script will create a web ui at http://localhost:3000/ to schedule updates.
+# You can set the port by setting the PORT environment variable.
+# You can also set the admin password by setting the adminPassword environment variable.
 # Made by iamEvanYT (Github)
 
-# Usage: python main.py [timeToRun] [universeId] [placeId] [placeFilePath] [versionType] [openCloudApiKey] [robloxCookie] [shouldReplaceServers] [successfulPublishEventName]
+# Usage: python .
 
 # CONFIG #
-useEnv = False # If enabled, use values from .env file instead of the values below. (Better security, if universeId is defined in .env, the value below will be ignored)
-useSys = True # If enabled and value is passed in command line, use values from command line instead of the values below.
-timeToRun = 0 #T his is a timestamp (https://www.epochconverter.com/)
-universeId = 0 # The identifier of the experience in which you want to publish your place to. You can copy your experience's Universe ID on Creator Dashboard.
-placeId = 0 # The identifier of the place you want to publish. You can copy your place's Place ID on Creator Dashboard.
-versionType = "Published" # The version type of the place you want to publish. You can choose between "Published" and "Saved".
-openCloudApiKey = "" # Your Roblox Open Cloud API key, used for saving/publishing the place file. (Generate one here: https://create.roblox.com/dashboard/credentials)
-robloxCookie = "" # Your Roblox Cookie, used for restarting servers. (Leave blank to disable, servers with only be restarted if the new version is Published)
-placeFilePath = "./place.rbxl" # The Path of the Roblox place file (RBXL Format) you want to publish.
-shouldReplaceServers = False # Whether or not you want to replace servers instead of restarting them. (Buggy & Experimental) (Not recommended)
-successfulPublishEventName = "" # The name of the MessagingService event that will be fired when the place is successfully published. (Leave blank to disable)
+adminPassword = "password" # The password for the admin user in web panel.
 
 # SCRIPT #
-import requests
-import time
+version = "v2.0.0"
+from dotenv import load_dotenv
+load_dotenv() # Load .env file
+
+from flask import Flask, send_from_directory, jsonify, request, render_template
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import os
-import sys
 import json
-hasRan = False
-version = "v1.1.1"
+import uuid
+import time
+from threading import Thread
+import update
 
-if (useEnv == True) or (os.environ.get('universeId') != None):
-    # Use default values if not defined in .env file
-    if os.environ.get('useSys') != None:
-        useSys = bool(os.environ.get('useSys'))
-    if os.environ.get('timeToRun') != None:
-        timeToRun = float(os.environ.get('timeToRun'))
-    if os.environ.get('universeId') != None:
-        universeId = int(os.environ.get('universeId'))
-    if os.environ.get('placeId') != None:
-        placeId = int(os.environ.get('placeId'))
-    if os.environ.get('versionType') != None:
-        versionType = str(os.environ.get('versionType'))
-    if os.environ.get('openCloudApiKey') != None:
-        openCloudApiKey = str(os.environ.get('openCloudApiKey'))
-    if os.environ.get('robloxCookie') != None:
-        robloxCookie = str(os.environ.get('robloxCookie'))
-    if os.environ.get('placeFilePath') != None:
-        placeFilePath = str(os.environ.get('placeFilePath'))
-    if os.environ.get('shouldReplaceServers') != None:
-        shouldReplaceServers = bool(os.environ.get('shouldReplaceServers'))
-    if os.environ.get('successfulPublishEventName') != None:
-        successfulPublishEventName = str(os.environ.get('successfulPublishEventName'))
-
-if (useSys == True) and (len(sys.argv) > 1):
+def delete_file(file_path):
     try:
-        if (sys.argv[1] != None):
-            timeToRun = int(sys.argv[1])
-        if (sys.argv[2] != None):
-            universeId = int(sys.argv[2])
-        if (sys.argv[3] != None):
-            placeId = int(sys.argv[3])
-        if (sys.argv[4] != None):
-            placeFilePath = sys.argv[4]
-        if (sys.argv[5] != None):
-            versionType = sys.argv[5]
-        if (sys.argv[6] != None):
-            openCloudApiKey = sys.argv[6]
-        if (sys.argv[7] != None):
-            robloxCookie = sys.argv[7]
-        if (sys.argv[8] != None):
-            shouldReplaceServers = bool(sys.argv[8])
-        if (sys.argv[9] != None):
-            successfulPublishEventName = sys.argv[9]
+        os.remove(file_path)
+        return True
+    except OSError:
+        return False
+
+if os.environ.get('adminPassword') != None:
+    adminPassword = str(os.environ.get('adminPassword'))
+
+def read_json(file_path,defaultData):
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        return defaultData
+    except Exception as e:
+        return defaultData
+def write_json(file_path, data):
+    try:
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        return True
+    except Exception as e:
+        return False
+
+app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 120 * 1000 * 1000 # 120MB max file size
+app.static_url_path = ''
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS = {'rbxl'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+auth = HTTPBasicAuth()
+
+users = {
+    "admin": generate_password_hash(adminPassword),
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and check_password_hash(users.get(username), password):
+        return username
+
+@app.route('/')
+@auth.login_required
+def index():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/<path:filename>')
+@auth.login_required
+def serve_static(filename):
+    if filename.endswith("/"):
+        filename = filename[:-1]
+    if os.path.isdir('static/' + filename):
+        index_file = os.path.join(filename, 'index.html')
+        if os.path.exists('static/' + index_file):
+            return send_from_directory('static', index_file)
+    return send_from_directory('static', filename)
+
+def getScheduledUpdates():
+    return read_json("./databases/scheduledUpdates.json", {})
+
+def setScheduledUpdates(newJson):
+    return write_json("./databases/scheduledUpdates.json", newJson)
+
+def getSettings():
+    configData = read_json("./databases/settings.json", {})
+    if (configData.get("robloxCookie") == None):
+        configData["robloxCookie"] = os.environ.get('robloxCookie','')
+    if (configData.get("openCloudApiKey") == None):
+        configData["openCloudApiKey"] = os.environ.get('openCloudApiKey','')
+    return configData
+
+def setSettings(newJson):
+    if (os.environ.get('robloxCookie') and newJson.get("robloxCookie") == os.environ.get('robloxCookie')):
+        del newJson["robloxCookie"]
+    if (os.environ.get('openCloudApiKey') and newJson.get("openCloudApiKey") == os.environ.get('openCloudApiKey')):
+        del newJson["openCloudApiKey"]
+    if (newJson.get("robloxCookie") == ""):
+        del newJson["robloxCookie"]
+    if (newJson.get("openCloudApiKey") == ""):
+        del newJson["openCloudApiKey"]
+    return write_json("./databases/settings.json", newJson)
+
+# API endpoint to retrieve scheduled updates
+@app.route('/api/getscheduledupdates', methods=['GET'])
+@auth.login_required
+def get_scheduled_updates():
+    return jsonify(getScheduledUpdates())
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def toInt(num):
+    try:
+        return int(num)
     except:
-        pass
+        return 0
+
+# API endpoint to create a new update
+@app.route('/api/setnewupdate', methods=['POST'])
+@auth.login_required
+def set_new_update():
+    # Generate a unique ID for the new update
+    UID = uuid.uuid4().hex
+    gameFile = request.files.get("file")
+    fileSize = gameFile.seek(0, os.SEEK_END)
+    gameFile.seek(0, os.SEEK_SET)
+    print("fileSize",fileSize)
+    if fileSize > (100 * 1000 * 1000): # 100MB max file size
+       return jsonify({"message": "This RBXL file is too big!"}) 
     
-if (placeFilePath == "") or (placeFilePath == None):
-    raise Exception("Please specify a place file path.")
-
-if (openCloudApiKey == "") or (openCloudApiKey == None):
-    raise Exception("Please specify an Open Cloud API key.")
-
-if (universeId == 0) or (universeId == None):
-    raise Exception("Please specify a universe ID.")
-
-if (placeId == 0) or (placeId == None):
-    raise Exception("Please specify a place ID.")
-
-desiredTimeToSave = (timeToRun - 2) # Start task 1 second before the timeToRun, because of the time it takes to publish the place file + shutting down servers
-desiredTimeToShutdown = (timeToRun)
-
-publishBaseUrl = "https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType={versionType}"
-shutdownBaseUrl = "https://www.roblox.com/games/shutdown-all-instances?placeId={placeId}&replaceInstances={shouldReplaceInstances}"
-messagingServiceBaseUrl = "https://apis.roblox.com/messaging-service/v1/universes/{universeId}/topics/{topic}"
-def SetPlaceFile():
-    url = publishBaseUrl.format(universeId=universeId, placeId=placeId, versionType=versionType)
-    # Post the file
-    with open(placeFilePath, 'rb') as file:
-        response = requests.post(url, data=file, headers={
-            "x-api-key": openCloudApiKey,
-            "Content-Type": "application/octet-stream"
-        })
-    if response.status_code == 200:
-        try:
-            json_response = response.json()
-            if isinstance(json_response, dict) and json_response.get("versionNumber"):
-                return True, "The response is a JSON object and it contains the key 'versionNumber'"
-            else:
-                return False, ("The response is a JSON object, but it does not contain the key 'versionNumber'")
-        except ValueError:
-            return False, "The response is not a JSON object"
-    else:
-        return False, ("Request failed with status code:"+ str(response.status_code))
-        
-def GetAuthenticatedSession():
-    session = requests.Session()
-    session.cookies[".ROBLOSECURITY"] = str(robloxCookie)
-    session.headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    formData = request.form.to_dict()
+    newScheduledUpdate = {
+        "id": UID,
+        "updateTime": toInt(formData.get("updateTime")),
+        "universeId": toInt(formData.get("universeId","0")),
+        "placeId": toInt(formData.get("placeId","0")),
+        "restartServers": formData.get("restartServers","none"),
+        "updateName": formData.get("updateName","Unnamed Update"),
+        "updateType": formData.get("updateType","publish"),
+        "overrideCookie": formData.get("overrideCookie",""),
+        "overrideOpenCloudKey": formData.get("overrideOpenCloudKey",""),
+        "status": "Scheduled",
+        "messagingServiceTopic": formData.get("messagingServiceTopic","")
     }
-
-    # send first request
-    req = session.post(
-        url="https://auth.roblox.com/"
-    )
-    
-    if "X-CSRF-Token" in req.headers:  # check if token is in response headers
-        session.headers["X-CSRF-Token"] = req.headers["X-CSRF-Token"]  # store the response header in the session
-    return session
-        
-def ShutdownServers():
-    session = GetAuthenticatedSession()
-
-    url = shutdownBaseUrl.format(placeId=placeId, shouldReplaceInstances=shouldReplaceServers)
-    response = session.post(url, data={
-        "placeId": placeId,
-        "replaceInstances": shouldReplaceServers
-    })
-    if response.status_code == 200:
-        return True, "Successfully shutdown servers"
+    if newScheduledUpdate["updateName"] == "":
+        newScheduledUpdate["updateName"] = "Unnamed Update"
+    if newScheduledUpdate["universeId"] == 0 or newScheduledUpdate["placeId"] == 0:
+        return jsonify({"message": "You must specify a universe ID or place ID"})
+    if gameFile and allowed_file(gameFile.filename):
+        filename = UID + ".rbxl"
+        gameFile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     else:
-        return False, ("Request failed with status code:"+ str(response.status_code))
+        return jsonify({"message": "You must upload a valid .rbxl file"})
+    updates = getScheduledUpdates()
+    updates[UID] = newScheduledUpdate
+    setScheduledUpdates(updates)
+    return jsonify({"message": "New update scheduled successfully"})
 
-def FireMessagingServiceEvent():
-    url = messagingServiceBaseUrl.format(universeId=universeId, topic=successfulPublishEventName)
-    response = requests.post(url, headers={
-        "x-api-key": openCloudApiKey,
-        "Content-Type": "application/json"
-    }, json={
-        "message": placeId
-    })
-    if response.status_code == 200:
-        return True, "Successfully fired event"
-    else:
-        return False, ("Request failed with status code:"+ str(response.status_code))
+@app.route('/api/updatescheduledupdate', methods=['POST'])
+@auth.login_required
+def update_an_update():
+    updatesToSearch = getScheduledUpdates()
+    json = request.get_json()
+    update = updatesToSearch.get(json.get("id",""))
+    if update == None:
+        return jsonify({"message": "Update not found"})
+    if json.get("updateName"):
+        update["updateName"] = json.get("updateName")
+    if json.get("updateTime"):
+        update["updateTime"] = toInt(json.get("updateTime"))
+    if json.get("universeId"):
+        update["universeId"] = toInt(json.get("universeId"))
+    if json.get("placeId"):
+        update["placeId"] = toInt(json.get("placeId"))
+    if json.get("restartServers"):
+        update["restartServers"] = json.get("restartServers")
+    if json.get("updateType"):
+        update["updateType"] = json.get("updateType")
+    if update["updateName"] == "":
+        update["updateName"] = "Unnamed Update"
+    if update["universeId"] == 0 or update["placeId"] == 0:
+        return jsonify({"message": "You must specify a universe ID or place ID"})
+    updates = getScheduledUpdates()
+    updates[update["id"]] = update
+    setScheduledUpdates(updates)
+    return jsonify({"message": "Editted scheduled update successfully"})
 
-def RunFunction():
-    status, message = SetPlaceFile()
-    if status == False:
-        print("Failed to publish place: " + message)
-        return
-    else:
-        if versionType == "Published":
-            print("Successfully published place!")
-            if (robloxCookie != "") or (successfulPublishEventName != ""):
-                while (time.time() < desiredTimeToShutdown):
-                    time.sleep(0.2)
-            if successfulPublishEventName != "":
-                print("Publishing message with MessagingService...")
-                fireStatus,fireMsg = FireMessagingServiceEvent()
-                if fireStatus != True:
-                    print("Failed to publish message: " + fireMsg)
-                else:
-                    print("Successfully published message!")
-            if robloxCookie != "":
-                print("Restarting servers...")
-                shutdownStatus,shutdownMsg = ShutdownServers()
-                if shutdownStatus != True:
-                    print("Failed to restart servers: " + shutdownMsg)
-                else:
-                    print("Successfully restarted servers!")
-        else:
-            print("Successfully saved place!")
+@app.route('/api/deletescheduledupdate', methods=['DELETE'])
+@auth.login_required
+def delete_scheduled_update():
+    updatesToSearch = getScheduledUpdates()
+    json = request.get_json()
+    update = updatesToSearch.get(json.get("id",""))
+    if update == None:
+        return jsonify({"message": "Update not found"})
+    updates = getScheduledUpdates()
+    del updates[update["id"]]
+    setScheduledUpdates(updates)
+    delete_file("./uploads/{UID}.rbxl".format(UID=update["id"]))
+    return jsonify({"message": "Scheduled update deleted successfully"})
+
+# API endpoint to get settings
+@app.route('/api/getsettings', methods=['GET'])
+@auth.login_required
+def get_settings():
+    return jsonify(getSettings())
+
+# API endpoint to update settings
+@app.route('/api/setsettings', methods=['POST'])
+@auth.login_required
+def set_settings():
+    updated_settings = request.get_json()
+    setSettings(updated_settings)
+    return jsonify({"message": "Settings updated successfully"})
 
 print("PythonPublisher started!")
 print(f"Version: {version}")
 print("Created by iamEvanYT (Github)")
-while True:
-    if hasRan == True:
-        break
-    if time.time() >= desiredTimeToSave:
-        RunFunction()
-        hasRan = True
-    time.sleep(0.5)
     
-print("PythonPublisher finished running!")
-while True:
-    time.sleep(60*60)
+def UpdateGame(UID,placeFilePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun):
+    success = update.RunUpdate(placeFilePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun)
+    get = getScheduledUpdates()
+    if success == True:
+        get[UID]["status"] = "Completed"
+    else:
+        get[UID]["status"] = "Failed"
+    setScheduledUpdates(get)
+    
+pathTemplate = "./uploads/{fileId}.rbxl"
+def CheckScheduledTasks():
+    updates = getScheduledUpdates()
+    for id in updates:
+        update = updates[id]
+        # check if epoch update time is less than current epoch time
+        # Start task 2 seconds before the timeToRun, because of the time it takes to publish the place file + shutting down servers
+        if ((update["updateTime"]-2) <= int(time.time()) and update["status"] == "Scheduled"):
+            get = getScheduledUpdates() # lock the task first so no other loops can run it
+            get[id]["status"] = "Working"
+            setScheduledUpdates(get)
+            filePath = pathTemplate.format(fileId=id)
+            settings = getSettings()
+            openCloudApiKey = settings["openCloudApiKey"]
+            universeId = update["universeId"]
+            placeId = update["placeId"]
+            if update["updateType"] == "publish":
+                versionType = "Published"
+            else:
+                versionType = "Saved"
+            robloxCookie = settings["robloxCookie"]
+            if update["overrideCookie"] != "":
+                robloxCookie = update["overrideCookie"]
+            if update["overrideOpenCloudKey"] != "":
+                openCloudApiKey = update["overrideOpenCloudKey"]
+            shouldReplaceServers = False
+            if update["restartServers"] == "shutdown":
+                shouldReplaceServers = False
+            elif update["restartServers"] == "migrate":
+                shouldReplaceServers = True
+            else:
+                robloxCookie = ""
+            successfulPublishEventName = ""
+            if update["messagingServiceTopic"] != "":
+                successfulPublishEventName = update["messagingServiceTopic"]
+            timeToRun = update["updateTime"]
+            updateThread = Thread(target=UpdateGame, args=(id,filePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun))
+            updateThread.start()
+           
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
+           
+def RunFlask():
+    app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=False)
+
+flaskRun = Thread(target=RunFlask)
+flaskRun.daemon = True
+flaskRun.start()
+
+def CheckScheduledTasksAsync():
+    try:
+        while True:
+            CheckScheduledTasks()
+            time.sleep(0.5)  # Sleep for a short duration to avoid high CPU usage
+    except KeyboardInterrupt:
+        exit(0)
+
+CheckScheduledTasksAsync()
