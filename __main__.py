@@ -222,10 +222,6 @@ def set_settings():
     updated_settings = request.get_json()
     setSettings(updated_settings)
     return jsonify({"message": "Settings updated successfully"})
-
-print("PythonPublisher started!")
-print(f"Version: {version}")
-print("Created by iamEvanYT (Github)")
     
 def UpdateGame(UID,placeFilePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun):
     success = update.RunUpdate(placeFilePath,openCloudApiKey,universeId,placeId,versionType,robloxCookie,shouldReplaceServers,successfulPublishEventName,timeToRun)
@@ -299,6 +295,9 @@ def RunFlask():
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
     PORT = os.environ.get('PORT', 3000)
+    print("PythonPublisher started!")
+    print(f"Version: {version}")
+    print("Created by iamEvanYT (Github)")
     print("Web Panel running on http://localhost:{port}/".format(port=PORT))
     class bcolors:
         HEADER = '\033[95m'
