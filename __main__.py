@@ -19,10 +19,7 @@ from flask import Flask, send_from_directory, jsonify, request, render_template
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import os
-import json
-import uuid
-import time
+import os,json,uuid,time,sys
 from threading import Thread
 import update
 
@@ -291,7 +288,30 @@ def forbidden(e):
     return render_template('403.html'), 403
            
 def RunFlask():
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=False)
+    import logging
+    import click
+    def secho(text, file=None, nl=None, err=None, color=None, **styles):
+        pass
+    def echo(text, file=None, nl=None, err=None, color=None, **styles):
+        pass
+    click.echo = echo
+    click.secho = secho
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    PORT = os.environ.get('PORT', 3000)
+    print("Web Panel running on http://localhost:{port}/".format(port=PORT))
+    class bcolors:
+        HEADER = '\033[95m'
+        OKBLUE = '\033[94m'
+        OKCYAN = '\033[96m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+    print(f"{bcolors.WARNING}Press CTRL+C to quit{bcolors.ENDC}")
+    app.run(host='0.0.0.0', port=PORT, debug=False)
 
 flaskRun = Thread(target=RunFlask)
 flaskRun.daemon = True
