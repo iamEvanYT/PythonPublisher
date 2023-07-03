@@ -282,18 +282,33 @@ def internal_server_error(e):
 @app.errorhandler(403)
 def forbidden(e):
     return render_template('403.html'), 403
+
+def CheckBlacklistedLogs(str):
+    if str.startswith(' * Serving Flask app '):
+        return True
+    if str.startswith(' * Debug mode: '):
+        return True
+    return False
            
 def RunFlask():
     import logging
     import click
+    old_secho = click.secho
+    old_echo = click.echo
     def secho(text, file=None, nl=None, err=None, color=None, **styles):
-        pass
+        if (CheckBlacklistedLogs(text) == True):
+            return
+        else:
+            old_secho(text, file=None, nl=None, err=None, color=None, **styles)
     def echo(text, file=None, nl=None, err=None, color=None, **styles):
-        pass
+        if (CheckBlacklistedLogs(text) == True):
+            return
+        else:
+            old_echo(text, file=None, nl=None, err=None, color=None, **styles)
     click.echo = echo
     click.secho = secho
     log = logging.getLogger('werkzeug')
-    log.setLevel(logging.ERROR)
+    log.setLevel(logging.CRITICAL)
     PORT = os.environ.get('PORT', 3000)
     print("PythonPublisher started!")
     print(f"Version: {version}")
