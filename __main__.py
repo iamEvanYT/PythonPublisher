@@ -97,6 +97,11 @@ def getSettings(HumanAccess):
             configData["robloxCookie"] = os.environ.get('robloxCookie','')
         if (configData.get("openCloudApiKey") == None):
             configData["openCloudApiKey"] = os.environ.get('openCloudApiKey','')
+    else:
+        if (configData.get("robloxCookie") == None):
+            configData["robloxCookie"] = ""
+        if (configData.get("openCloudApiKey") == None):
+            configData["openCloudApiKey"] = ""
     return configData
 
 def setSettings(newJson):
