@@ -90,19 +90,16 @@ def getScheduledUpdates():
 def setScheduledUpdates(newJson):
     return write_json("./databases/scheduledUpdates.json", newJson)
 
-def getSettings():
+def getSettings(HumanAccess):
     configData = read_json("./databases/settings.json", {})
-    if (configData.get("robloxCookie") == None):
-        configData["robloxCookie"] = os.environ.get('robloxCookie','')
-    if (configData.get("openCloudApiKey") == None):
-        configData["openCloudApiKey"] = os.environ.get('openCloudApiKey','')
+    if (HumanAccess != True):
+        if (configData.get("robloxCookie") == None):
+            configData["robloxCookie"] = os.environ.get('robloxCookie','')
+        if (configData.get("openCloudApiKey") == None):
+            configData["openCloudApiKey"] = os.environ.get('openCloudApiKey','')
     return configData
 
 def setSettings(newJson):
-    if (os.environ.get('robloxCookie') and newJson.get("robloxCookie") == os.environ.get('robloxCookie')):
-        del newJson["robloxCookie"]
-    if (os.environ.get('openCloudApiKey') and newJson.get("openCloudApiKey") == os.environ.get('openCloudApiKey')):
-        del newJson["openCloudApiKey"]
     if (newJson.get("robloxCookie") == ""):
         del newJson["robloxCookie"]
     if (newJson.get("openCloudApiKey") == ""):
@@ -213,7 +210,7 @@ def delete_scheduled_update():
 @app.route('/api/getsettings', methods=['GET'])
 @auth.login_required
 def get_settings():
-    return jsonify(getSettings())
+    return jsonify(getSettings(True))
 
 # API endpoint to update settings
 @app.route('/api/setsettings', methods=['POST'])
